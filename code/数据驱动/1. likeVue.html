@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="root">
+        <p>{{name}}</p>
+        <p>{{message}}</p>
+    </div>
+
+    <script>
+
+        let rkuohao = /\{\{(.+?)\}\}/g;
+
+        // 步骤拆解
+        // 1. 拿到模板
+        // 2. 拿到数据（data）
+        // 3. 将数据与模板结合， 得到的是 HTML 元素（DOM 元素）
+        // 4. 放到页面中
+
+        // 1
+        let temNode = document.querySelector('#root'); // 元素拿到了 模板就拿到了
+        // 2
+        let data = {
+            name: 'test_Name',
+            message: 'test_message'
+        }
+        // 3
+        // 一般都是使用递归
+        // 在现在这个案例中 template 是 DOM 元素，
+        // 在真正 Vue 源码中 DOM -> 字符串模板 -> VNode -> 真正的 DOM
+        function compiler(template, data) {
+            let childNodes = template.childNodes // 取出子元素 childNodes 用于得到一个包含了子节点的数组
+            for (let i = 0; i < childNodes.length; i++) {
+                let type = childNodes[i].nodeType // nodeType 用于获取node节点类型 1 元素，3 文本节点
+                if (type === 3) {
+                    // 文本节点，可以判断里面是否有 {{}} 插值
+                    let txt = childNodes[i].nodeValue // nodeValue 该属性只有文本节点才有意义
+
+                    // 有没有双括号 ?
+                    txt = txt.replace(rkuohao, function (_, g) { // replace 使用正则匹配到一次函数就会被调用一次，函数的第 0 个参数，表示匹配到的内容，函数的第 n 个参数， 表示正则的第 n 组
+                        let key = g.trim() // 写在双括号里面的东西
+                        let value = data[key]
+
+                        // 将 {{ xxx }} 用这个值替换
+                        return value
+                    })
+
+                    // 注意: txt 和 现在的 DOM 元素没有关系,手动给他赋值回 nodeValue
+                    childNodes[i].nodeValue = txt
+
+                } else if (type === 1) {
+                    // 元素，考虑它有没有子元素，是否需要将其子元素进行判断 是否要插值
+                    compiler(childNodes[i], data)
+                }
+            }
+        }
+
+        let generateNode = temNode.cloneNode(true) // cloneNode() 方法可创建指定的节点的精确拷贝。如果传递给它的参数是 true，它还将递归复制当前节点的所有子孙节点。否则，它只复制当前节点。
+
+        console.log('模板', temNode) // 模板
+
+        compiler(generateNode, data)
+
+        console.log('新生成的标签', generateNode) // 新生成的标签
+
+        // 4
+        root.parentNode.replaceChild(generateNode, root) // replaceChild() 方法可将某个子节点替换为另一个。replaceChild(newnode,oldnode);
+    </script>
+</body>
+
+</html>
