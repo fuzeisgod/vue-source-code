@@ -14,26 +14,8 @@
     </div>
 
     <script>
-
         let rkuohao = /\{\{(.+?)\}\}/g;
 
-        // 步骤拆解
-        // 1. 拿到模板
-        // 2. 拿到数据（data）
-        // 3. 将数据与模板结合， 得到的是 HTML 元素（DOM 元素）
-        // 4. 放到页面中
-
-        // 1
-        let temNode = document.querySelector('#root'); // 元素拿到了 模板就拿到了
-        // 2
-        let data = {
-            name: 'test_Name',
-            message: 'test_message'
-        }
-        // 3
-        // 一般都是使用递归
-        // 在现在这个案例中 template 是 DOM 元素，
-        // 在真正 Vue 源码中 DOM -> 字符串模板 -> VNode -> 真正的 DOM
         function compiler(template, data) {
             let childNodes = template.childNodes // 取出子元素 childNodes 用于得到一个包含了子节点的数组
             for (let i = 0; i < childNodes.length; i++) {
@@ -61,17 +43,45 @@
             }
         }
 
-        // 利用模板生成一个需要被渲染的 HTML 标签（准 真正 在页面中显示的标签）
-        let generateNode = temNode.cloneNode(true) // cloneNode() 方法可创建指定的节点的精确拷贝。如果传递给它的参数是 true，它还将递归复制当前节点的所有子孙节点。否则，它只复制当前节点。
+        function Zx_Vue(options) {
+            // 习惯： 内部的数据使用 下划线 开头，只读数据使用 $ 开头
+            this._data = options.data;
+            this._el = options.el;
 
-        console.log('模板', temNode) // 模板
+            // 准备工作（准备模板)
+            this._templateDOM = document.querySelector(this._el);
+            this._parent = this._templateDOM.parentNode;
 
-        compiler(generateNode, data)
+            // 渲染工作
+            this.render()
+        }
 
-        console.log('新生成的标签', generateNode) // 新生成的标签
+        // 将模板结合数据， 得到 HTML，加到页面中去
+        Zx_Vue.prototype.render = function () {
+            this.compiler()
+        }
+        // 编译， 将模板与数据结合， 得到真正的 DOM 元素
+        Zx_Vue.prototype.compiler = function (tmpNode) {
+            let realHTMLDOM = this._templateDOM.cloneNode(true) // 用模板拷贝得到一个 准 DOM
+            compiler(realHTMLDOM, this._data)
+            this.updata(realHTMLDOM)
+        }
+        // 将 DOM 元素放到页面中
+        Zx_Vue.prototype.updata = function (realDOM) {
+            this._parent.replaceChild(realDOM, document.querySelector('#root'))
+        }
 
-        // 4
-        root.parentNode.replaceChild(generateNode, root) // replaceChild() 方法可将某个子节点替换为另一个。replaceChild(newnode,oldnode);
+
+        // 想想怎么用
+        let app = new Zx_Vue({
+            el: '#root',
+            data: {
+                name: 'czx',
+                message: 'info'
+            }
+        })
+
+        console.log(app)
     </script>
 </body>
 
