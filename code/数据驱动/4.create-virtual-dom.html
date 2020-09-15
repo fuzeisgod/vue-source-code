@@ -78,11 +78,40 @@
             return _vnode;
         }
 
+        /* 将 vnode 转化为真正的 DOM */
+        function parseVNode(vnode) {
+            let type = vnode.type;
+            let _dom = null;
+            if (type === 1) {
+                // 元素节点
+                _dom = document.createElement(vnode.tag)
+                // 现在这个vnode.data 是键值对
+                Object.keys(vnode.data).forEach(key => {
+                    let _attr = document.createAttribute(key)
+                    _attr.value = vnode.data[key]
+                    _dom.setAttributeNode(_attr)
+                })
+
+                // 考虑虚拟 DOM 有 children
+                let childVNode = vnode.children;
+                for (let i = 0; i < childVNode.length; i++) {
+                    _dom.appendChild(parseVNode(childVNode[i])); // 递归
+                }
+
+            } else if (type === 3) {
+                // 文本节点
+                _dom = document.createTextNode(vnode.value)
+            }
+
+            return _dom
+        }
+
         let root = document.querySelector('#root');
-
-        let vroot = getVNode(root)
-
+        let vroot = getVNode(root) // DOM => 虚拟 DOM
+        let dom = parseVNode(vroot) // 虚拟 DOM => DOM
+        console.log(root)
         console.log(vroot)
+        // console.log(dom)
 
     </script>
 </body>
