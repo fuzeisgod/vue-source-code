@@ -12,6 +12,25 @@
 
         function Zx_Vue(options) {
             this._data = options.data
+            this._el = options.el
+
+            this.mount(); // 挂载
+        }
+
+        Zx_Vue.prototype.mount = function () {
+
+            // 需要提供一个 render 方法：生成虚拟 DOM
+
+            this.mountComponent()
+        }
+
+        Zx_Vue.prototype.mountComponent = function () {
+
+            let mount = function () {
+                this.update(this.render())
+            }
+
+            mount.call(this) // 本质应该交给 watcher 来调用
         }
 
     </script>
