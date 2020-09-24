@@ -20,6 +20,7 @@
         Zx_Vue.prototype.mount = function () {
 
             // 需要提供一个 render 方法：生成虚拟 DOM
+            this.render = this.createRenderFn()
 
             this.mountComponent()
         }
@@ -31,6 +32,22 @@
             }
 
             mount.call(this) // 本质应该交给 watcher 来调用
+        }
+
+        /*
+         *  在真正的 Vue 中使用了二次提交的 设计结构
+         *  1. 在页面中的 DOM 和 虚拟 DOM 是一一对应的关系
+         *  
+        */
+
+        // 这里是生成 render 函数，目的是缓存 抽象语法树（我们使用虚拟 DOM 来模拟）
+        Zx_Vue.prototype.createRenderFn = function() {
+
+        }
+
+        // 将虚拟 DOM 渲染到页面中：diff 算法就在这里
+        Zx_Vue.prototype.update = function() {
+
         }
 
     </script>
