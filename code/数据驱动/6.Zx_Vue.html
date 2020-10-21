@@ -12,7 +12,7 @@
 
         function Zx_Vue(options) {
             this._data = options.data
-            this._el = options.el
+            this._template = options.el // vue 是字符串， 这里是 DOM
 
             this.mount(); // 挂载
         }
@@ -20,7 +20,8 @@
         Zx_Vue.prototype.mount = function () {
 
             // 需要提供一个 render 方法：生成虚拟 DOM
-            this.render = this.createRenderFn()
+            // 这里的this都是指 构造函数 Zx_Vue 创造出的实例
+            this.render = this.createRenderFn() // render作用：结合抽象语法树生成新的虚拟 DOM
 
             this.mountComponent()
         }
@@ -37,20 +38,28 @@
         /*
          *  在真正的 Vue 中使用了二次提交的 设计结构
          *  1. 在页面中的 DOM 和 虚拟 DOM 是一一对应的关系
-         *  
+         *  2. 先由 AST 和 数据 生成  VNode（新, render）
+         *  3. 将 VNode（旧）和 VNode（新）比较（diff算法）， 更新（update），不是替换，是比较区别后更新
         */
 
         // 这里是生成 render 函数，目的是缓存 抽象语法树（我们使用虚拟 DOM 来模拟）
-        Zx_Vue.prototype.createRenderFn = function() {
+        Zx_Vue.prototype.createRenderFn = function () {
+
+            // vue: 将 AST + data => VNode
+            // 简化：带坑的 VNode + data => 含有数据的 VNode
+            return function render() {
+
+            }
 
         }
 
         // 将虚拟 DOM 渲染到页面中：diff 算法就在这里
-        Zx_Vue.prototype.update = function() {
+        Zx_Vue.prototype.update = function () {
 
         }
 
     </script>
+
 </body>
 
 </html>
