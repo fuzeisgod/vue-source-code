@@ -30,7 +30,7 @@
         // 3. 标签属性(data)：  <div title="1" class="c" /> => { tag: 'div', data: { title: '1', class: 'c' } }
         // 4. 子节点(children)：  <div><div /></div> => { tag: 'div', children: [{ tag: 'div' }] }
 
-
+        // 虚拟 DOM 构造函数
         class VNode {
             constructor(tag, data, value, type) {
                 this.tag = tag && tag.toLowerCase()
